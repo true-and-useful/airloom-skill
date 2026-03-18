@@ -104,7 +104,7 @@ Email code flow:
 After authenticating:
 
 1. Read the claim token from `.airloom/state.json`.
-2. `POST /api/v1/audio/:slug/claim` with `{"token": "..."}` and the Bearer header.
+2. `POST /api/v1/episodes/:slug/claim` with `{"token": "..."}` and the Bearer header.
 3. Tell the user: "Done — your audio is now permanent."
 
 ## Limits

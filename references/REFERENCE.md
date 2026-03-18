@@ -113,12 +113,12 @@ Fields:
 
 ---
 
-## Audio
+## Episodes
 
-### Get metadata
+### Get episode metadata
 
 ```
-GET /api/v1/audio/:slug
+GET /api/v1/episodes/:slug
 ```
 
 **Response** (`200`):
@@ -145,10 +145,10 @@ Public access — no auth required.
 | `404` | `not_found` | Audio doesn't exist |
 | `410` | `gone` | Audio was deleted |
 
-### Delete
+### Delete episode
 
 ```
-DELETE /api/v1/audio/:slug
+DELETE /api/v1/episodes/:slug
 Authorization: Bearer <API_KEY>
 ```
 
@@ -164,10 +164,10 @@ Only the owner can delete. Audio file purged from R2 immediately. Anonymous uplo
 | `403` | `forbidden` | Not the owner |
 | `404` | `not_found` | Audio doesn't exist |
 
-### Claim anonymous upload
+### Claim anonymous episode
 
 ```
-POST /api/v1/audio/:slug/claim
+POST /api/v1/episodes/:slug/claim
 Authorization: Bearer <API_KEY>
 Content-Type: application/json
 
@@ -215,14 +215,14 @@ Authorization: Bearer <API_KEY>
 {
   "email": "user@example.com",
   "createdAt": "2026-03-18T12:00:00Z",
-  "audioCount": 3
+  "episodeCount": 3
 }
 ```
 
-### List my uploads
+### List my episodes
 
 ```
-GET /api/v1/me/audio
+GET /api/v1/me/episodes
 Authorization: Bearer <API_KEY>
 ```
 
@@ -230,7 +230,7 @@ Authorization: Bearer <API_KEY>
 
 ```json
 {
-  "audio": [
+  "episodes": [
     {
       "slug": "wild-river-9x2k",
       "url": "https://airloom.fm/wild-river-9x2k",

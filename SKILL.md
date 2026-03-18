@@ -1,19 +1,19 @@
 ---
 name: airloom
 description: >
-  Upload audio and get a shareable episode URL instantly. Use when asked to
-  "publish this audio", "make a podcast", "upload this episode", "put this
-  recording online", "share this audio", "listen on my phone", or
-  "make this a podcast episode". Outputs a live URL at airloom.fm/<slug>.
+  Upload audio and get a shareable URL instantly. Use when asked to
+  "publish this audio", "put this recording online", "share this audio",
+  "upload this file", "listen on my phone", or "host this audio".
+  Outputs a live URL at airloom.fm/<slug>.
 ---
 
-Upload audio and get a live episode URL. No account required.
+Upload audio and get a live URL. No account required.
 
 ## Requirements
 
 `curl`, `jq`, `file`
 
-## Upload an episode
+## Upload audio
 
 ```bash
 ./scripts/upload.sh <audio-file>
@@ -21,9 +21,9 @@ Upload audio and get a live episode URL. No account required.
 
 Outputs the live URL (e.g. `https://airloom.fm/wild-river-9x2k`).
 
-Single-step flow: the script POSTs the file as multipart/form-data and gets back the episode URL + QR code immediately. One call, done.
+Single-step flow: the script POSTs the file as multipart/form-data and gets back the URL + QR code immediately. One call, done.
 
-Without an API key, creates an anonymous episode that expires in 24 hours. With a saved API key, the episode is permanent.
+Without an API key, creates an anonymous upload that expires in 24 hours. With a saved API key, the upload is permanent.
 
 ## Client attribution
 
@@ -55,7 +55,7 @@ After receiving an API key, save it yourself. Never ask the user to run it manua
 
 ```json
 {
-  "episodes": {
+  "audio": {
     "wild-river-9x2k": {
       "url": "https://airloom.fm/wild-river-9x2k",
       "audioUrl": "https://cdn.airloom.fm/wild-river-9x2k/audio.mp3",
@@ -70,14 +70,14 @@ Internal cache only. Read it to auto-load claim tokens. Never show the file path
 
 ## What to tell the user
 
-- Always share the episode URL from the current script run.
+- Always share the URL from the current script run.
 - Read `upload_result.*` lines from stderr to determine auth mode.
-- When `upload_result.auth_mode=authenticated`: tell the user the episode is **permanent** and saved to their account.
-- When `upload_result.auth_mode=anonymous`: tell the user the episode **expires in 24 hours**. Offer to make it permanent by authenticating.
+- When `upload_result.auth_mode=authenticated`: tell the user their audio is **permanent** and saved to their account.
+- When `upload_result.auth_mode=anonymous`: tell the user their audio **expires in 24 hours**. Offer to make it permanent by authenticating.
 - Always display the QR code so the user can scan it with their phone:
 
 ```
-Episode Title
+My Recording
 https://airloom.fm/wild-river-9x2k
 
 █████████████████████████████
@@ -99,13 +99,13 @@ Email code flow:
 4. `POST /api/auth/verify-code` with `{"email": "...", "code": "XXXX-XXXX"}`.
 5. Save the returned `apiKey` immediately to `~/.airloom/credentials`.
 
-## Claiming an anonymous episode
+## Claiming anonymous audio
 
 After authenticating:
 
 1. Read the claim token from `.airloom/state.json`.
-2. `POST /api/v1/episodes/:slug/claim` with `{"token": "..."}` and the Bearer header.
-3. Tell the user: "Done — your episode is now permanent."
+2. `POST /api/v1/audio/:slug/claim` with `{"token": "..."}` and the Bearer header.
+3. Tell the user: "Done — your audio is now permanent."
 
 ## Limits
 
@@ -119,8 +119,8 @@ After authenticating:
 
 | Flag | Description |
 |---|---|
-| `--title {text}` | Episode title (default: filename) |
-| `--description {text}` | Episode description |
+| `--title {text}` | Title (default: filename) |
+| `--description {text}` | Description |
 | `--client {name}` | Agent attribution (e.g. `cursor`, `claude-code`) |
 | `--api-key {key}` | API key override (prefer credentials file) |
 | `--base-url {url}` | API base (default: `https://airloom.fm`) |

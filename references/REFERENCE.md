@@ -68,7 +68,7 @@ Content-Type: application/json
 
 ## Upload
 
-### Upload an episode
+### Upload audio
 
 ```
 POST /api/v1/upload
@@ -91,8 +91,8 @@ Fields:
   "audioUrl": "https://cdn.airloom.fm/wild-river-9x2k/audio.mp3",
   "qr": "█████████████████████████████\n...",
   "fileSizeBytes": 4832000,
-  "title": "My First Episode",
-  "description": "Show notes here",
+  "title": "My Recording",
+  "description": "Notes here",
   "createdAt": "2026-03-18T12:00:00Z",
   "claimToken": "a1b2c3d4e5...",
   "claimUrl": "https://airloom.fm/claim?slug=wild-river-9x2k&token=a1b2c3d4e5",
@@ -113,12 +113,12 @@ Fields:
 
 ---
 
-## Episodes
+## Audio
 
-### Get episode metadata
+### Get metadata
 
 ```
-GET /api/v1/episodes/:slug
+GET /api/v1/audio/:slug
 ```
 
 **Response** (`200`):
@@ -128,8 +128,8 @@ GET /api/v1/episodes/:slug
   "slug": "wild-river-9x2k",
   "url": "https://airloom.fm/wild-river-9x2k",
   "audioUrl": "https://cdn.airloom.fm/wild-river-9x2k/audio.mp3",
-  "title": "My First Episode",
-  "description": "Show notes here",
+  "title": "My Recording",
+  "description": "Notes here",
   "fileSizeBytes": 4832000,
   "createdAt": "2026-03-18T12:00:00Z",
   "expiresAt": null
@@ -142,32 +142,32 @@ Public access — no auth required.
 
 | Status | Error | When |
 |---|---|---|
-| `404` | `not_found` | Episode doesn't exist |
-| `410` | `gone` | Episode was deleted |
+| `404` | `not_found` | Audio doesn't exist |
+| `410` | `gone` | Audio was deleted |
 
-### Delete episode
+### Delete
 
 ```
-DELETE /api/v1/episodes/:slug
+DELETE /api/v1/audio/:slug
 Authorization: Bearer <API_KEY>
 ```
 
 **Response**: `204 No Content`
 
-Only the owner can delete. Audio purged from R2 immediately. Anonymous episodes cannot be manually deleted — they expire after 24 hours.
+Only the owner can delete. Audio file purged from R2 immediately. Anonymous uploads cannot be manually deleted — they expire after 24 hours.
 
 **Errors**:
 
 | Status | Error | When |
 |---|---|---|
 | `401` | `unauthorized` | Missing or invalid API key |
-| `403` | `forbidden` | Not the episode owner |
-| `404` | `not_found` | Episode doesn't exist |
+| `403` | `forbidden` | Not the owner |
+| `404` | `not_found` | Audio doesn't exist |
 
-### Claim anonymous episode
+### Claim anonymous upload
 
 ```
-POST /api/v1/episodes/:slug/claim
+POST /api/v1/audio/:slug/claim
 Authorization: Bearer <API_KEY>
 Content-Type: application/json
 
@@ -185,7 +185,7 @@ Content-Type: application/json
 }
 ```
 
-`expiresAt: null` confirms the episode is now permanent.
+`expiresAt: null` confirms the audio is now permanent.
 
 **Rules**: Requires valid API key. Token must match the `claimToken` from upload. Single-use. Must claim before `expiresAt`.
 
@@ -195,8 +195,8 @@ Content-Type: application/json
 |---|---|---|
 | `401` | `unauthorized` | Missing or invalid API key |
 | `403` | `invalid_claim_token` | Wrong token |
-| `404` | `not_found` | Episode doesn't exist or expired |
-| `409` | `already_claimed` | Episode already belongs to a user |
+| `404` | `not_found` | Audio doesn't exist or expired |
+| `409` | `already_claimed` | Audio already belongs to a user |
 
 ---
 
@@ -215,14 +215,14 @@ Authorization: Bearer <API_KEY>
 {
   "email": "user@example.com",
   "createdAt": "2026-03-18T12:00:00Z",
-  "episodeCount": 3
+  "audioCount": 3
 }
 ```
 
-### List my episodes
+### List my uploads
 
 ```
-GET /api/v1/me/episodes
+GET /api/v1/me/audio
 Authorization: Bearer <API_KEY>
 ```
 
@@ -230,11 +230,11 @@ Authorization: Bearer <API_KEY>
 
 ```json
 {
-  "episodes": [
+  "audio": [
     {
       "slug": "wild-river-9x2k",
       "url": "https://airloom.fm/wild-river-9x2k",
-      "title": "My First Episode",
+      "title": "My Recording",
       "fileSizeBytes": 4832000,
       "createdAt": "2026-03-18T12:00:00Z",
       "expiresAt": null
@@ -243,4 +243,4 @@ Authorization: Bearer <API_KEY>
 }
 ```
 
-Ordered by `createdAt` descending. No pagination (max 500 episodes per user).
+Ordered by `createdAt` descending. No pagination (max 500 uploads per user).

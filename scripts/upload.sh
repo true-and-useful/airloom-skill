@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# airloom upload script — uploads audio and gets a shareable episode URL.
+# airloom upload script — uploads audio and gets a shareable URL.
 # Dependencies: curl, jq, file (optional but recommended)
 
 AIRLOOM_BASE_URL="https://airloom.fm"
@@ -18,8 +18,8 @@ usage() {
 Usage: upload.sh <audio-file> [options]
 
 Options:
-  --title <text>                   Episode title (default: filename)
-  --description <text>             Episode description
+  --title <text>                   Title (default: filename)
+  --description <text>             Description
   --client <name>                  Agent attribution (e.g. cursor, claude-code)
   --api-key <key>                  API key override (prefer credentials file)
   --base-url <url>                 API base (default: https://airloom.fm)
@@ -155,7 +155,7 @@ SLUG="$(echo "$HTTP_RESPONSE" | jq -r '.slug // empty')"
 
 # --- parse response ---------------------------------------------------------
 
-EPISODE_URL="$(echo "$HTTP_RESPONSE" | jq -r '.url')"
+PAGE_URL="$(echo "$HTTP_RESPONSE" | jq -r '.url')"
 AUDIO_URL="$(echo "$HTTP_RESPONSE" | jq -r '.audioUrl')"
 CLAIM_TOKEN="$(echo "$HTTP_RESPONSE" | jq -r '.claimToken // empty')"
 EXPIRES_AT="$(echo "$HTTP_RESPONSE" | jq -r '.expiresAt // empty')"
@@ -176,9 +176,9 @@ STATE_DIR=".airloom"
 STATE_FILE="${STATE_DIR}/state.json"
 mkdir -p "$STATE_DIR"
 
-# build episode entry
-EPISODE_JSON="$(jq -n \
-  --arg url "$EPISODE_URL" \
+# build state entry
+ENTRY_JSON="$(jq -n \
+  --arg url "$PAGE_URL" \
   --arg audioUrl "$AUDIO_URL" \
   --arg claimToken "$CLAIM_TOKEN" \
   --arg expiresAt "$EXPIRES_AT" \
@@ -191,21 +191,21 @@ EPISODE_JSON="$(jq -n \
 if [[ -f "$STATE_FILE" ]]; then
   EXISTING="$(cat "$STATE_FILE")"
 else
-  EXISTING='{"episodes":{}}'
+  EXISTING='{"audio":{}}'
 fi
 
 echo "$EXISTING" | jq \
   --arg slug "$SLUG" \
-  --argjson entry "$EPISODE_JSON" \
-  '.episodes[$slug] = $entry' > "$STATE_FILE"
+  --argjson entry "$ENTRY_JSON" \
+  '.audio[$slug] = $entry' > "$STATE_FILE"
 
-# --- stdout: episode URL only -----------------------------------------------
+# --- stdout: URL only -------------------------------------------------------
 
-echo "$EPISODE_URL"
+echo "$PAGE_URL"
 
 # --- stderr: structured output for agent parsing ----------------------------
 
-emit "upload_result.episode_url=${EPISODE_URL}"
+emit "upload_result.url=${PAGE_URL}"
 emit "upload_result.audio_url=${AUDIO_URL}"
 emit "upload_result.auth_mode=${AUTH_MODE}"
 emit "upload_result.api_key_source=${API_KEY_SOURCE}"

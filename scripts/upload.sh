@@ -20,6 +20,7 @@ Usage: upload.sh <audio-file> [options]
 Options:
   --title <text>                   Title (default: filename)
   --description <text>             Description
+  --podcast <slug>                 Assign to a podcast (requires auth)
   --client <name>                  Agent attribution (e.g. cursor, claude-code)
   --api-key <key>                  API key override (prefer credentials file)
   --base-url <url>                 API base (default: https://airloom.fm)
@@ -44,6 +45,7 @@ fi
 AUDIO_FILE=""
 TITLE=""
 DESCRIPTION=""
+PODCAST=""
 CLIENT=""
 API_KEY=""
 
@@ -51,6 +53,7 @@ while [[ $# -gt 0 ]]; do
   case "$1" in
     --title)       TITLE="$2"; shift 2 ;;
     --description) DESCRIPTION="$2"; shift 2 ;;
+    --podcast)     PODCAST="$2"; shift 2 ;;
     --client)      CLIENT="$2"; shift 2 ;;
     --api-key)     API_KEY="$2"; shift 2 ;;
     --base-url)    AIRLOOM_BASE_URL="$2"; shift 2 ;;
@@ -116,6 +119,12 @@ if [[ -z "$TITLE" ]]; then
   TITLE="${TITLE%.*}"
 fi
 
+# --- podcast requires auth --------------------------------------------------
+
+if [[ -n "$PODCAST" ]] && [[ -z "$API_KEY" ]]; then
+  die "--podcast requires authentication (set API key via --api-key, \$AIRLOOM_API_KEY, or ~/.airloom/credentials)"
+fi
+
 # --- build curl args --------------------------------------------------------
 
 CURL_ARGS=(
@@ -128,6 +137,7 @@ CURL_ARGS=(
 )
 
 [[ -n "$DESCRIPTION" ]] && CURL_ARGS+=(-F "description=${DESCRIPTION}")
+[[ -n "$PODCAST" ]]     && CURL_ARGS+=(-F "podcast=${PODCAST}")
 
 if [[ -n "$API_KEY" ]]; then
   CURL_ARGS+=(-H "Authorization: Bearer ${API_KEY}")

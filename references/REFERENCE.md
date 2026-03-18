@@ -80,6 +80,7 @@ Fields:
   file           required  audio file (MP3, M4A, OGG — max 100 MB)
   title          optional  string (max 200 chars, default: filename)
   description    optional  string (max 5000 chars, plain text)
+  podcast        optional  podcast slug — assigns to a podcast (requires auth)
 ```
 
 **Response** (`201 Created`):
@@ -197,6 +198,92 @@ Content-Type: application/json
 | `403` | `invalid_claim_token` | Wrong token |
 | `404` | `not_found` | Audio doesn't exist or expired |
 | `409` | `already_claimed` | Audio already belongs to a user |
+
+---
+
+## Podcasts
+
+### Create podcast
+
+```
+POST /api/v1/podcasts
+Authorization: Bearer <API_KEY>
+Content-Type: application/json
+
+{ "title": "My Podcast", "description": "Optional description" }
+```
+
+**Response** (`201 Created`):
+
+```json
+{
+  "id": "uuid",
+  "slug": "bright-creek-4x2m",
+  "title": "My Podcast",
+  "description": "Optional description",
+  "feedUrl": "https://airloom.fm/p/bright-creek-4x2m/feed.xml",
+  "createdAt": "2026-03-18T18:00:00Z"
+}
+```
+
+**Errors**:
+
+| Status | Error | When |
+|---|---|---|
+| `400` | `missing_field` | Title missing |
+| `401` | `unauthorized` | Missing or invalid API key |
+
+### Get podcast
+
+```
+GET /api/v1/podcasts/:slug
+```
+
+**Response** (`200`):
+
+```json
+{
+  "slug": "bright-creek-4x2m",
+  "title": "My Podcast",
+  "description": "Optional description",
+  "feedUrl": "https://airloom.fm/p/bright-creek-4x2m/feed.xml",
+  "episodeCount": 5,
+  "createdAt": "2026-03-18T18:00:00Z"
+}
+```
+
+Public access. 404 if not found, 410 if deleted.
+
+### RSS feed
+
+```
+GET /p/:slug/feed.xml
+```
+
+Returns RSS 2.0 XML with `<enclosure>` tags for each episode. Public access. Episodes ordered by `created_at` descending.
+
+### List my podcasts
+
+```
+GET /api/v1/me/podcasts
+Authorization: Bearer <API_KEY>
+```
+
+**Response** (`200`):
+
+```json
+{
+  "podcasts": [
+    {
+      "slug": "bright-creek-4x2m",
+      "title": "My Podcast",
+      "feedUrl": "https://airloom.fm/p/bright-creek-4x2m/feed.xml",
+      "episodeCount": 5,
+      "createdAt": "2026-03-18T18:00:00Z"
+    }
+  ]
+}
+```
 
 ---
 

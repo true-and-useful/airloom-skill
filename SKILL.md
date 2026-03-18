@@ -1,13 +1,14 @@
 ---
 name: airloom
 description: >
-  Upload audio and get a shareable URL instantly. Use when asked to
-  "publish this audio", "put this recording online", "share this audio",
-  "upload this file", "listen on my phone", or "host this audio".
+  Upload audio and get a shareable URL instantly. Supports podcasts with
+  RSS feeds. Use when asked to "publish this audio", "put this recording
+  online", "share this audio", "upload this file", "create a podcast",
+  "add this to my podcast", or "host this audio".
   Outputs a live URL at airloom.fm/<slug>.
 ---
 
-Upload audio and get a live URL. No account required.
+Upload audio and get a live URL. Create podcasts with RSS feeds. No account required for standalone uploads.
 
 ## Requirements
 
@@ -99,6 +100,41 @@ Email code flow:
 4. `POST /api/auth/verify-code` with `{"email": "...", "code": "XXXX-XXXX"}`.
 5. Save the returned `apiKey` immediately to `~/.airloom/credentials`.
 
+## Podcasts
+
+Authenticated users can create podcasts (named feeds) and assign uploads as episodes.
+
+**Creating a podcast** — requires auth:
+
+```bash
+curl -sS -X POST https://airloom.fm/api/v1/podcasts \
+  -H "Authorization: Bearer $(cat ~/.airloom/credentials)" \
+  -H "Content-Type: application/json" \
+  -d '{"title": "My Podcast", "description": "Optional description"}'
+```
+
+Returns `slug` and `feedUrl` (e.g. `https://airloom.fm/p/bright-creek-4x2m/feed.xml`).
+
+**Uploading an episode to a podcast:**
+
+```bash
+./scripts/upload.sh recording.mp3 --podcast bright-creek-4x2m --title "Episode 1"
+```
+
+The `--podcast` flag requires authentication. The podcast must exist and be owned by the authenticated user.
+
+**What to tell the user after creating a podcast:**
+- Share the feed URL: `https://airloom.fm/p/<slug>/feed.xml`
+- Tell them: "Subscribe to this URL in any podcast app (Apple Podcasts, Overcast, Pocket Casts, etc.)"
+- New episodes uploaded with `--podcast` will appear in the feed automatically
+
+**Listing podcasts:**
+
+```bash
+curl -sS https://airloom.fm/api/v1/me/podcasts \
+  -H "Authorization: Bearer $(cat ~/.airloom/credentials)"
+```
+
 ## Claiming anonymous audio
 
 After authenticating:
@@ -121,6 +157,7 @@ After authenticating:
 |---|---|
 | `--title {text}` | Title (default: filename) |
 | `--description {text}` | Description |
+| `--podcast {slug}` | Assign to a podcast (requires auth) |
 | `--client {name}` | Agent attribution (e.g. `cursor`, `claude-code`) |
 | `--api-key {key}` | API key override (prefer credentials file) |
 | `--base-url {url}` | API base (default: `https://airloom.fm`) |

@@ -161,3 +161,20 @@ After authenticating:
 | `--client {name}` | Agent attribution (e.g. `cursor`, `claude-code`) |
 | `--api-key {key}` | API key override (prefer credentials file) |
 | `--base-url {url}` | API base (default: `https://airloom.fm`) |
+
+## API routes
+
+All endpoints are at `https://airloom.fm`. See `references/REFERENCE.md` for auth, payloads, and error handling.
+
+| Method | Path | What it does |
+|---|---|---|
+| `POST` | `/api/v1/upload` | Upload audio (auth optional) |
+| `GET` | `/api/v1/episodes/:slug` | Get episode metadata |
+| `DELETE` | `/api/v1/episodes/:slug` | Delete episode (owner only) |
+| `POST` | `/api/v1/episodes/:slug/claim` | Claim anonymous upload |
+| `POST` | `/api/v1/podcasts` | Create podcast |
+| `GET` | `/api/v1/podcasts/:slug` | Get podcast metadata |
+| `GET` | `/api/v1/me/podcasts` | List my podcasts |
+| `GET` | `/api/v1/me/episodes` | List my episodes |
+| `GET` | `/api/v1/me` | Get current user |
+| `GET` | `/p/:slug/feed.xml` | RSS feed (public) |

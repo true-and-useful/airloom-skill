@@ -103,6 +103,8 @@ Fields:
 
 `claimToken`, `claimUrl`, `expiresAt` omitted for authenticated uploads (permanent).
 
+When `podcast` field is provided, the response also includes `showUrl` (the podcast show page URL), and the `qr` field encodes the show page URL instead of the episode URL.
+
 **Errors**:
 
 | Status | Error | When |
@@ -253,6 +255,14 @@ GET /api/v1/podcasts/:slug
 ```
 
 Public access. 404 if not found, 410 if deleted.
+
+### Show page
+
+```
+GET /p/:slug
+```
+
+Returns an HTML page for the podcast — title, description, episode list, and a platform-aware subscribe button. Public access. This is the URL to share or encode in a QR code.
 
 ### RSS feed
 

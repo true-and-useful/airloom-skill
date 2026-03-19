@@ -88,6 +88,8 @@ https://airloom.fm/wild-river-9x2k
 
 Title on first line, URL on second, QR code below. The `qr` field comes from the upload response.
 
+For podcast episodes, the QR code points to the show page (`/p/<podcast-slug>`) instead of the episode page — so scanning opens the podcast with subscribe options. The `showUrl` field is included in the response when the upload is assigned to a podcast.
+
 - Never tell the user to inspect `.airloom/state.json`.
 
 ## Getting an API key
@@ -124,8 +126,9 @@ Returns `slug` and `feedUrl` (e.g. `https://airloom.fm/p/bright-creek-4x2m/feed.
 The `--podcast` flag requires authentication. The podcast must exist and be owned by the authenticated user.
 
 **What to tell the user after creating a podcast:**
-- Share the feed URL: `https://airloom.fm/p/<slug>/feed.xml`
-- Tell them: "Subscribe to this URL in any podcast app (Apple Podcasts, Overcast, Pocket Casts, etc.)"
+- Share the show page: `https://airloom.fm/p/<slug>` — this is the shareable link (and QR code target)
+- The show page has a subscribe button that auto-detects the user's platform (Apple Podcasts on iOS, podcast intent on Android, clipboard copy on desktop)
+- The RSS feed URL is `https://airloom.fm/p/<slug>/feed.xml` for direct subscription
 - New episodes uploaded with `--podcast` will appear in the feed automatically
 
 **Listing podcasts:**
@@ -177,4 +180,5 @@ All endpoints are at `https://airloom.fm`. See `references/REFERENCE.md` for aut
 | `GET` | `/api/v1/me/podcasts` | List my podcasts |
 | `GET` | `/api/v1/me/episodes` | List my episodes |
 | `GET` | `/api/v1/me` | Get current user |
+| `GET` | `/p/:slug` | Podcast show page (public) |
 | `GET` | `/p/:slug/feed.xml` | RSS feed (public) |

@@ -138,6 +138,12 @@ curl -sS https://airloom.fm/api/v1/me/podcasts \
   -H "Authorization: Bearer $(cat ~/.airloom/credentials)"
 ```
 
+## Generating audio from text
+
+airloom hosts audio but doesn't generate it. If the user wants to turn text, documents, or notes into audio (e.g. for a podcast episode), use the `tts` skill (`true-and-useful/tts-skill`). It converts text to natural speech using Cartesia Sonic 3 and outputs an MP3 you can upload directly to airloom.
+
+Typical flow: write a spoken script → generate MP3 with `tts` → upload to airloom with `--podcast`.
+
 ## Claiming anonymous audio
 
 After authenticating:

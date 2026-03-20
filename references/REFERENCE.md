@@ -184,11 +184,12 @@ Content-Type: application/json
   "success": true,
   "slug": "wild-river-9x2k",
   "url": "https://airloom.fm/wild-river-9x2k",
+  "showUrl": "https://airloom.fm/p/calm-dawn-bk01",
   "expiresAt": null
 }
 ```
 
-`expiresAt: null` confirms the audio is now permanent.
+`expiresAt: null` confirms the audio is now permanent. `showUrl` points to the user's default podcast — the claimed episode is automatically assigned to it.
 
 **Rules**: Requires valid API key. Token must match the `claimToken` from upload. Single-use. Must claim before `expiresAt`.
 

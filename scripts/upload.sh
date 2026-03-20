@@ -168,13 +168,22 @@ SLUG="$(echo "$HTTP_RESPONSE" | jq -r '.slug // empty')"
 PAGE_URL="$(echo "$HTTP_RESPONSE" | jq -r '.url')"
 AUDIO_URL="$(echo "$HTTP_RESPONSE" | jq -r '.audioUrl')"
 SHOW_URL="$(echo "$HTTP_RESPONSE" | jq -r '.showUrl // empty')"
-CLAIM_TOKEN="$(echo "$HTTP_RESPONSE" | jq -r '.claimToken // empty')"
+RETURNED_API_KEY="$(echo "$HTTP_RESPONSE" | jq -r '.apiKey // empty')"
 EXPIRES_AT="$(echo "$HTTP_RESPONSE" | jq -r '.expiresAt // empty')"
 QR="$(echo "$HTTP_RESPONSE" | jq -r '.qr // empty')"
 
+# --- auto-store API key if returned (first upload creates provisional user) ---
+
+if [[ -n "$RETURNED_API_KEY" ]]; then
+  mkdir -p "$HOME/.airloom"
+  echo "$RETURNED_API_KEY" > "$HOME/.airloom/credentials"
+  chmod 600 "$HOME/.airloom/credentials"
+  API_KEY_SOURCE="auto_provisioned"
+fi
+
 # determine auth mode
-if [[ -n "$CLAIM_TOKEN" ]]; then
-  AUTH_MODE="anonymous"
+if [[ -n "$EXPIRES_AT" ]] && [[ "$EXPIRES_AT" != "null" ]]; then
+  AUTH_MODE="provisional"
   PERSISTENCE="expires_24h"
 else
   AUTH_MODE="authenticated"
@@ -191,11 +200,11 @@ mkdir -p "$STATE_DIR"
 ENTRY_JSON="$(jq -n \
   --arg url "$PAGE_URL" \
   --arg audioUrl "$AUDIO_URL" \
-  --arg claimToken "$CLAIM_TOKEN" \
+  --arg showUrl "$SHOW_URL" \
   --arg expiresAt "$EXPIRES_AT" \
   '{url: $url, audioUrl: $audioUrl} +
-   (if $claimToken != "" then {claimToken: $claimToken} else {} end) +
-   (if $expiresAt != "" then {expiresAt: $expiresAt} else {} end)'
+   (if $showUrl != "" then {showUrl: $showUrl} else {} end) +
+   (if $expiresAt != "" and $expiresAt != "null" then {expiresAt: $expiresAt} else {} end)'
 )"
 
 # merge with existing state if present
@@ -223,8 +232,7 @@ emit "upload_result.auth_mode=${AUTH_MODE}"
 emit "upload_result.api_key_source=${API_KEY_SOURCE}"
 emit "upload_result.persistence=${PERSISTENCE}"
 
-[[ -n "$EXPIRES_AT" ]]  && emit "upload_result.expires_at=${EXPIRES_AT}"
-[[ -n "$CLAIM_TOKEN" ]] && emit "upload_result.claim_token=${CLAIM_TOKEN}"
+[[ -n "$EXPIRES_AT" ]] && [[ "$EXPIRES_AT" != "null" ]] && emit "upload_result.expires_at=${EXPIRES_AT}"
 
 if [[ -n "$QR" ]]; then
   emit "upload_result.qr=${QR}"

@@ -89,21 +89,23 @@ Fields:
 {
   "slug": "wild-river-9x2k",
   "url": "https://airloom.fm/wild-river-9x2k",
+  "showUrl": "https://airloom.fm/p/calm-dawn-bk01",
   "audioUrl": "https://cdn.airloom.fm/wild-river-9x2k/audio.mp3",
   "qr": "█████████████████████████████\n...",
   "fileSizeBytes": 4832000,
   "title": "My Recording",
   "description": "Notes here",
   "createdAt": "2026-03-18T12:00:00Z",
-  "claimToken": "a1b2c3d4e5...",
-  "claimUrl": "https://airloom.fm/claim?slug=wild-river-9x2k&token=a1b2c3d4e5",
-  "expiresAt": "2026-03-19T12:00:00Z"
+  "expiresAt": "2026-03-19T12:00:00Z",
+  "apiKey": "4a78471890eea83c..."
 }
 ```
 
-`claimToken`, `claimUrl`, `expiresAt` omitted for authenticated uploads (permanent).
+`showUrl` always points to the effective podcast's show page. `qr` encodes the show page URL.
 
-When `podcast` field is provided, the response also includes `showUrl` (the podcast show page URL), and the `qr` field encodes the show page URL instead of the episode URL.
+`apiKey` is only returned on first upload (when a provisional user is created). The agent must store it immediately. Subsequent uploads do not return `apiKey`.
+
+`expiresAt` is null for verified users (permanent). For provisional users, episodes expire after 24h.
 
 **Errors**:
 
@@ -167,31 +169,11 @@ Only the owner can delete. Audio file purged from R2 immediately. Anonymous uplo
 | `403` | `forbidden` | Not the owner |
 | `404` | `not_found` | Audio doesn't exist |
 
-### Claim anonymous episode
+### Make content permanent (verify email)
 
-```
-POST /api/v1/episodes/:slug/claim
-Authorization: Bearer <API_KEY>
-Content-Type: application/json
+Provisional users have expiring content. To make everything permanent, attach an email via the verify-code flow. Send `POST /api/auth/verify-code` with `{ "email": "...", "code": "..." }` and the `Authorization: Bearer <API_KEY>` header. This attaches the email, clears expiry on all episodes, and rotates the API key.
 
-{ "token": "a1b2c3d4e5..." }
-```
-
-**Response** (`200`):
-
-```json
-{
-  "success": true,
-  "slug": "wild-river-9x2k",
-  "url": "https://airloom.fm/wild-river-9x2k",
-  "showUrl": "https://airloom.fm/p/calm-dawn-bk01",
-  "expiresAt": null
-}
-```
-
-`expiresAt: null` confirms the audio is now permanent. `showUrl` points to the user's default podcast — the claimed episode is automatically assigned to it.
-
-**Rules**: Requires valid API key. Token must match the `claimToken` from upload. Single-use. Must claim before `expiresAt`.
+**Legacy claim endpoint** (`POST /api/v1/episodes/:slug/claim`) is retained for backward compatibility with pre-existing uploads that have claim tokens. New uploads do not generate claim tokens.
 
 **Errors**:
 

@@ -24,7 +24,7 @@ Outputs the live URL (e.g. `https://airloom.fm/wild-river-9x2k`).
 
 Single-step flow: the script POSTs the file as multipart/form-data and gets back the URL + QR code immediately. One call, done.
 
-Without an API key, creates an anonymous upload that expires in 24 hours. With a saved API key, the upload is permanent.
+On first upload (no API key), the server creates a provisional account and returns an API key. The script auto-saves it to `~/.airloom/credentials`. Episodes expire after 24 hours until the user verifies their email. Subsequent uploads use the saved key automatically.
 
 ## Client attribution
 
@@ -74,7 +74,7 @@ Internal cache only. Read it to auto-load claim tokens. Never show the file path
 - Always share the URL from the current script run.
 - Read `upload_result.*` lines from stderr to determine auth mode.
 - When `upload_result.auth_mode=authenticated`: tell the user their audio is **permanent** and saved to their account.
-- When `upload_result.auth_mode=anonymous`: tell the user their audio **expires in 24 hours**. Offer to make it permanent by authenticating.
+- When `upload_result.auth_mode=provisional`: tell the user their audio **expires in 24 hours**. Their account was created automatically — offer to make it permanent by verifying their email (see "Getting an API key" below, but skip the key storage step since the script already saved it).
 - Always display the QR code so the user can scan it with their phone:
 
 ```
@@ -144,13 +144,16 @@ airloom hosts audio but doesn't generate it. If the user wants to turn text, doc
 
 Typical flow: write a spoken script → generate MP3 with `tts` → upload to airloom with `--podcast`.
 
-## Claiming anonymous audio
+## Making content permanent
 
-After authenticating:
+Provisional users have expiring content. To make everything permanent, verify an email:
 
-1. Read the claim token from `.airloom/state.json`.
-2. `POST /api/v1/episodes/:slug/claim` with `{"token": "..."}` and the Bearer header.
-3. Tell the user: "Done — your audio is now permanent."
+1. Ask the user for their email.
+2. `POST /api/auth/request-code` with `{"email": "..."}`.
+3. Tell the user: "Check your inbox for a sign-in code from airloom.fm and paste it here."
+4. `POST /api/auth/verify-code` with `{"email": "...", "code": "XXXX-XXXX"}` and the `Authorization: Bearer` header (using the key from `~/.airloom/credentials`).
+5. Save the returned `apiKey` to `~/.airloom/credentials` (the key is rotated on verify).
+6. Tell the user: "Done — your podcast is now permanent."
 
 ## Limits
 

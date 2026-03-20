@@ -149,9 +149,11 @@ fi
 
 # --- upload -----------------------------------------------------------------
 
-HTTP_RESPONSE="$(curl "${CURL_ARGS[@]}")" || {
-  # try to extract error from JSON response
-  ERR="$(echo "$HTTP_RESPONSE" | jq -r '.error // empty' 2>/dev/null)"
+RESP_FILE="$(mktemp)"
+trap 'rm -f "$RESP_FILE"' EXIT
+
+curl "${CURL_ARGS[@]}" > "$RESP_FILE" || {
+  ERR="$(jq -r '.error // empty' < "$RESP_FILE" 2>/dev/null)"
   if [[ -n "$ERR" ]]; then
     die "upload failed: $ERR"
   else
@@ -160,17 +162,17 @@ HTTP_RESPONSE="$(curl "${CURL_ARGS[@]}")" || {
 }
 
 # validate response is JSON with a slug
-SLUG="$(echo "$HTTP_RESPONSE" | jq -r '.slug // empty')"
+SLUG="$(jq -r '.slug // empty' < "$RESP_FILE")"
 [[ -n "$SLUG" ]] || die "unexpected response: missing slug"
 
 # --- parse response ---------------------------------------------------------
 
-PAGE_URL="$(echo "$HTTP_RESPONSE" | jq -r '.url')"
-AUDIO_URL="$(echo "$HTTP_RESPONSE" | jq -r '.audioUrl')"
-SHOW_URL="$(echo "$HTTP_RESPONSE" | jq -r '.showUrl // empty')"
-RETURNED_API_KEY="$(echo "$HTTP_RESPONSE" | jq -r '.apiKey // empty')"
-EXPIRES_AT="$(echo "$HTTP_RESPONSE" | jq -r '.expiresAt // empty')"
-QR="$(echo "$HTTP_RESPONSE" | jq -r '.qr // empty')"
+PAGE_URL="$(jq -r '.url' < "$RESP_FILE")"
+AUDIO_URL="$(jq -r '.audioUrl' < "$RESP_FILE")"
+SHOW_URL="$(jq -r '.showUrl // empty' < "$RESP_FILE")"
+RETURNED_API_KEY="$(jq -r '.apiKey // empty' < "$RESP_FILE")"
+EXPIRES_AT="$(jq -r '.expiresAt // empty' < "$RESP_FILE")"
+QR="$(jq -r '.qr // empty' < "$RESP_FILE")"
 
 # --- auto-store API key if returned (first upload creates provisional user) ---
 

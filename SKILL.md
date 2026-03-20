@@ -60,14 +60,14 @@ After receiving an API key, save it yourself. Never ask the user to run it manua
     "wild-river-9x2k": {
       "url": "https://airloom.fm/wild-river-9x2k",
       "audioUrl": "https://cdn.airloom.fm/wild-river-9x2k/audio.mp3",
-      "claimToken": "a1b2c3...",
+      "showUrl": "https://airloom.fm/p/calm-dawn-bk01",
       "expiresAt": "2026-03-19T12:00:00Z"
     }
   }
 }
 ```
 
-Internal cache only. Read it to auto-load claim tokens. Never show the file path to the user.
+Internal cache only. Never show the file path to the user.
 
 ## What to tell the user
 

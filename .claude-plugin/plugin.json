@@ -1,0 +1,5 @@
+{
+  "name": "airloom",
+  "description": "Upload audio and get a shareable URL instantly. Supports podcasts with RSS feeds.",
+  "version": "1.0.0"
+}

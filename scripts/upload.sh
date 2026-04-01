@@ -23,6 +23,8 @@ Options:
   --podcast <slug>                 Assign to a podcast (requires auth)
   --client <name>                  Agent attribution (e.g. cursor, claude-code)
   --api-key <key>                  API key override (prefer credentials file)
+  --podcast-title <text>           Name for auto-created default podcast
+  --podcast-description <text>     Description for auto-created default podcast
   --base-url <url>                 API base (default: https://airloom.fm)
   --allow-nonairloom-base-url      Required when using --base-url
 EOF
@@ -46,6 +48,8 @@ AUDIO_FILE=""
 TITLE=""
 DESCRIPTION=""
 PODCAST=""
+PODCAST_TITLE=""
+PODCAST_DESCRIPTION=""
 CLIENT=""
 API_KEY=""
 
@@ -54,6 +58,8 @@ while [[ $# -gt 0 ]]; do
     --title)       TITLE="$2"; shift 2 ;;
     --description) DESCRIPTION="$2"; shift 2 ;;
     --podcast)     PODCAST="$2"; shift 2 ;;
+    --podcast-title) PODCAST_TITLE="$2"; shift 2 ;;
+    --podcast-description) PODCAST_DESCRIPTION="$2"; shift 2 ;;
     --client)      CLIENT="$2"; shift 2 ;;
     --api-key)     API_KEY="$2"; shift 2 ;;
     --base-url)    AIRLOOM_BASE_URL="$2"; shift 2 ;;
@@ -136,8 +142,10 @@ CURL_ARGS=(
   -F "title=${TITLE}"
 )
 
-[[ -n "$DESCRIPTION" ]] && CURL_ARGS+=(-F "description=${DESCRIPTION}")
-[[ -n "$PODCAST" ]]     && CURL_ARGS+=(-F "podcast=${PODCAST}")
+[[ -n "$DESCRIPTION" ]]         && CURL_ARGS+=(-F "description=${DESCRIPTION}")
+[[ -n "$PODCAST" ]]             && CURL_ARGS+=(-F "podcast=${PODCAST}")
+[[ -n "$PODCAST_TITLE" ]]       && CURL_ARGS+=(-F "podcast_title=${PODCAST_TITLE}")
+[[ -n "$PODCAST_DESCRIPTION" ]] && CURL_ARGS+=(-F "podcast_description=${PODCAST_DESCRIPTION}")
 
 if [[ -n "$API_KEY" ]]; then
   CURL_ARGS+=(-H "Authorization: Bearer ${API_KEY}")

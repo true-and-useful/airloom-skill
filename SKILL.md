@@ -174,6 +174,8 @@ Provisional users have expiring content. To make everything permanent, verify an
 | `--client {name}` | Agent attribution (e.g. `cursor`, `claude-code`) |
 | `--api-key {key}` | API key override (prefer credentials file) |
 | `--base-url {url}` | API base (default: `https://airloom.fm`) |
+| `--podcast-title {text}` | Name for auto-created default podcast (first upload only) |
+| `--podcast-description {text}` | Description for auto-created default podcast |
 
 ## API routes
 
@@ -186,6 +188,7 @@ All endpoints are at `https://airloom.fm`. See `references/REFERENCE.md` for aut
 | `DELETE` | `/api/v1/episodes/:slug` | Delete episode (owner only) |
 | `POST` | `/api/v1/episodes/:slug/claim` | Claim anonymous upload |
 | `POST` | `/api/v1/podcasts` | Create podcast |
+| `PATCH` | `/api/v1/podcasts/:slug` | Update podcast title/description |
 | `GET` | `/api/v1/podcasts/:slug` | Get podcast metadata |
 | `GET` | `/api/v1/me/podcasts` | List my podcasts |
 | `GET` | `/api/v1/me/episodes` | List my episodes |

@@ -77,10 +77,12 @@ X-Airloom-Client: claude-code         (optional)
 Content-Type: multipart/form-data
 
 Fields:
-  file           required  audio file (MP3, M4A, OGG — max 100 MB)
-  title          optional  string (max 200 chars, default: filename)
-  description    optional  string (max 5000 chars, plain text)
-  podcast        optional  podcast slug — assigns to a podcast (requires auth)
+  file                  required  audio file (MP3, M4A, OGG — max 100 MB)
+  title                 optional  string (max 200 chars, default: filename)
+  description           optional  string (max 5000 chars, plain text)
+  podcast               optional  podcast slug — assigns to a podcast (requires auth)
+  podcast_title         optional  name for auto-created default podcast (first upload only)
+  podcast_description   optional  description for auto-created default podcast
 ```
 
 **Response** (`201 Created`):
@@ -218,6 +220,29 @@ Content-Type: application/json
 |---|---|---|
 | `400` | `missing_field` | Title missing |
 | `401` | `unauthorized` | Missing or invalid API key |
+
+### Update podcast
+
+```
+PATCH /api/v1/podcasts/:slug
+Authorization: Bearer <API_KEY>
+Content-Type: application/json
+
+{ "title": "New Name", "description": "New description" }
+```
+
+Both fields optional (at least one required). Only the owner can update.
+
+**Response** (`200`): same shape as GET podcast.
+
+**Errors**:
+
+| Status | Error | When |
+|---|---|---|
+| `400` | `missing_field` | No valid fields provided |
+| `401` | `unauthorized` | Missing or invalid API key |
+| `403` | `forbidden` | Not the owner |
+| `404` | `not_found` | Podcast doesn't exist |
 
 ### Get podcast
 

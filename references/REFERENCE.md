@@ -88,8 +88,9 @@ Fields:
 ```json
 {
   "slug": "wild-river-9x2k",
-  "url": "https://airloom.fm/wild-river-9x2k",
   "showUrl": "https://airloom.fm/p/calm-dawn-bk01",
+  "feedUrl": "https://airloom.fm/p/calm-dawn-bk01/feed.xml",
+  "episodeUrl": "https://airloom.fm/wild-river-9x2k",
   "audioUrl": "https://cdn.airloom.fm/wild-river-9x2k/audio.mp3",
   "qr": "█████████████████████████████\n...",
   "fileSizeBytes": 4832000,
@@ -131,7 +132,7 @@ GET /api/v1/episodes/:slug
 ```json
 {
   "slug": "wild-river-9x2k",
-  "url": "https://airloom.fm/wild-river-9x2k",
+  "episodeUrl": "https://airloom.fm/wild-river-9x2k",
   "audioUrl": "https://cdn.airloom.fm/wild-river-9x2k/audio.mp3",
   "title": "My Recording",
   "description": "Notes here",
@@ -313,7 +314,7 @@ Authorization: Bearer <API_KEY>
   "episodes": [
     {
       "slug": "wild-river-9x2k",
-      "url": "https://airloom.fm/wild-river-9x2k",
+      "episodeUrl": "https://airloom.fm/wild-river-9x2k",
       "title": "My Recording",
       "fileSizeBytes": 4832000,
       "createdAt": "2026-03-18T12:00:00Z",

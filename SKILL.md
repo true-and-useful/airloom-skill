@@ -58,9 +58,10 @@ After receiving an API key, save it yourself. Never ask the user to run it manua
 {
   "audio": {
     "wild-river-9x2k": {
-      "url": "https://airloom.fm/wild-river-9x2k",
+      "episodeUrl": "https://airloom.fm/wild-river-9x2k",
       "audioUrl": "https://cdn.airloom.fm/wild-river-9x2k/audio.mp3",
       "showUrl": "https://airloom.fm/p/calm-dawn-bk01",
+      "feedUrl": "https://airloom.fm/p/calm-dawn-bk01/feed.xml",
       "expiresAt": "2026-03-19T12:00:00Z"
     }
   }

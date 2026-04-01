@@ -167,9 +167,10 @@ SLUG="$(jq -r '.slug // empty' < "$RESP_FILE")"
 
 # --- parse response ---------------------------------------------------------
 
-PAGE_URL="$(jq -r '.url' < "$RESP_FILE")"
+EPISODE_URL="$(jq -r '.episodeUrl' < "$RESP_FILE")"
 AUDIO_URL="$(jq -r '.audioUrl' < "$RESP_FILE")"
 SHOW_URL="$(jq -r '.showUrl // empty' < "$RESP_FILE")"
+FEED_URL="$(jq -r '.feedUrl // empty' < "$RESP_FILE")"
 RETURNED_API_KEY="$(jq -r '.apiKey // empty' < "$RESP_FILE")"
 EXPIRES_AT="$(jq -r '.expiresAt // empty' < "$RESP_FILE")"
 QR="$(jq -r '.qr // empty' < "$RESP_FILE")"
@@ -200,12 +201,14 @@ mkdir -p "$STATE_DIR"
 
 # build state entry
 ENTRY_JSON="$(jq -n \
-  --arg url "$PAGE_URL" \
+  --arg episodeUrl "$EPISODE_URL" \
   --arg audioUrl "$AUDIO_URL" \
   --arg showUrl "$SHOW_URL" \
+  --arg feedUrl "$FEED_URL" \
   --arg expiresAt "$EXPIRES_AT" \
-  '{url: $url, audioUrl: $audioUrl} +
+  '{episodeUrl: $episodeUrl, audioUrl: $audioUrl} +
    (if $showUrl != "" then {showUrl: $showUrl} else {} end) +
+   (if $feedUrl != "" then {feedUrl: $feedUrl} else {} end) +
    (if $expiresAt != "" and $expiresAt != "null" then {expiresAt: $expiresAt} else {} end)'
 )"
 
@@ -223,13 +226,14 @@ echo "$EXISTING" | jq \
 
 # --- stdout: URL only -------------------------------------------------------
 
-echo "$PAGE_URL"
+echo "$EPISODE_URL"
 
 # --- stderr: structured output for agent parsing ----------------------------
 
-emit "upload_result.url=${PAGE_URL}"
+emit "upload_result.episode_url=${EPISODE_URL}"
 emit "upload_result.audio_url=${AUDIO_URL}"
 [[ -n "$SHOW_URL" ]]   && emit "upload_result.show_url=${SHOW_URL}"
+[[ -n "$FEED_URL" ]]   && emit "upload_result.feed_url=${FEED_URL}"
 emit "upload_result.auth_mode=${AUTH_MODE}"
 emit "upload_result.api_key_source=${API_KEY_SOURCE}"
 emit "upload_result.persistence=${PERSISTENCE}"
